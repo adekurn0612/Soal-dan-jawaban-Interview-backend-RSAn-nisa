@@ -52,39 +52,43 @@ const findAllJadwalDoctorQuery = async (req, res) => {
 
   const PostJadwalDoctor = async (req, res) => {
     try {
-        const { name, doctor_id , day, startDate, endDate , time_start , time_finish, qouta , status} = req.body;
-
-  const startDateObj = dayjs(startDate, 'YYYY-MM-DD');
-  const endDateObj = dayjs(endDate, 'YYYY-MM-DD');
-
-  const mondays = [];
-console.log(startDate , endDate)
-let currentDate = startDateObj;
-while (currentDate.isBefore(endDateObj) || currentDate.isSame(endDateObj, 'day')) {
-  if (currentDate.day() === 1) { // Senin memiliki indeks 1 pada plugin 'weekday'
-    mondays.push(currentDate.format('YYYY-MM-DD'));
-  }
-  currentDate = currentDate.add(1, 'day');
-}
-
-  const output = mondays.map(date => {
-    return {
-      name,
-      day,
-      date,
-      doctor_id,
-      time_finish,
-      time_start,
-      qouta,
-      status
-    };
-  });
-
-  res.json(output);
-  } catch (e) {
-    res.json(e.message);
-  }
-    };
+      const { name, doctor_id, day, startDate, endDate, time_start, time_finish, qouta, status } = req.body;
+  
+      const startDateObj = dayjs(startDate, 'YYYY-MM-DD');
+      const endDateObj = dayjs(endDate, 'YYYY-MM-DD');
+  
+      const mondays = [];
+      console.log(startDate, endDate);
+      let currentDate = startDateObj;
+      while (currentDate.isBefore(endDateObj) || currentDate.isSame(endDateObj, 'day')) {
+        if (currentDate.day() === 1) { // Senin memiliki indeks 1 pada plugin 'weekday'
+          mondays.push(currentDate.format('YYYY-MM-DD'));
+        }
+        currentDate = currentDate.add(1, 'day');
+      }
+  
+      const output = [];
+      for (const date of mondays) {
+        const Data = await models.jadwal_doctor.create({
+          name,
+          day,
+          datee :date,
+          doctor_id,
+          time_start,
+          time_finish,
+          qouta,
+          status,
+        });
+        output.push(Data);
+      }
+  
+      res.send({ message: 'berhasil', result: output });
+    } catch (e) {
+      res.json(e.message);
+    }
+  };
+  
+  
   
 
 export default {
