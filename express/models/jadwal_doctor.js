@@ -36,8 +36,7 @@ export default class jadwal_doctor extends Model {
     },
     datee: {
       type: DataTypes.DATEONLY,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_DATE')
+      allowNull: true
     },
     day: {
       type: DataTypes.ENUM("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"),

@@ -1,5 +1,10 @@
 import models, { sequelize } from "../models/init-models.js"
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import weekday from 'dayjs/plugin/weekday.js';
 
+dayjs.extend(customParseFormat);
+dayjs.extend(weekday);
 
 
 const findAllJadwalDoctormodels = async (req, res) => {
@@ -42,27 +47,48 @@ const findAllJadwalDoctorQuery = async (req, res) => {
   };
 
 
-  import models, { sequelize } from "../models/init-models.js"
 
 
 
-const PostJadwalDoctor = async (req, res) => {
-  try {
-    const Data = await models.jadwal_doctor.create({
-      include: [
-        {
-        model: models.doctor,
-        as: "doctor",
-        }
-    ]
-    });
-    res.send( {message : 'berhasil',result:Data} );
+  const PostJadwalDoctor = async (req, res) => {
+    try {
+        const { name, doctor_id , day, startDate, endDate , time_start , time_finish, qouta , status} = req.body;
+
+  const startDateObj = dayjs(startDate, 'YYYY-MM-DD');
+  const endDateObj = dayjs(endDate, 'YYYY-MM-DD');
+
+  const mondays = [];
+console.log(startDate , endDate)
+let currentDate = startDateObj;
+while (currentDate.isBefore(endDateObj) || currentDate.isSame(endDateObj, 'day')) {
+  if (currentDate.day() === 1) { // Senin memiliki indeks 1 pada plugin 'weekday'
+    mondays.push(currentDate.format('YYYY-MM-DD'));
+  }
+  currentDate = currentDate.add(1, 'day');
+}
+
+  const output = mondays.map(date => {
+    return {
+      name,
+      day,
+      date,
+      doctor_id,
+      time_finish,
+      time_start,
+      qouta,
+      status
+    };
+  });
+
+  res.json(output);
   } catch (e) {
     res.json(e.message);
   }
-};
+    };
+  
 
 export default {
   findAllJadwalDoctormodels,
   findAllJadwalDoctorQuery,
+  PostJadwalDoctor
 };
